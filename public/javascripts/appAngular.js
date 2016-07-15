@@ -9,7 +9,12 @@ function($stateProvider, $urlRouterProvider) {
     .state('home', {
       url: '/home',
       templateUrl: '/home.html',
-      controller: 'PostCtrl'
+      controller: 'PostCtrl',
+      resolve:{
+      	postPromise:['posts',function(posts){
+      		return posts.getAll();
+      	}]
+      }
     })
     .state('detail', {
 	  url: '/details/{id}',
@@ -22,11 +27,25 @@ function($stateProvider, $urlRouterProvider) {
 
 /* service angular */
 
-app.factory("posts",[function(){
+app.factory("posts",['$http',function($http){
 
-	return {
+	var p={
 		posts:[]
 	};
+	p.getAll=function(){
+		return $http.get("/posts").success(function(data){
+			angular.copy(data,p.posts);
+		});
+
+	};
+	
+	p.create = function(post) {
+	  return $http.post('/posts', post).success(function(data){
+	    p.posts.push(data);
+	  });
+	};
+
+	return p;
 
 }]);
 
@@ -38,10 +57,11 @@ app.controller('PostCtrl', [
 
 $scope.addPost=function(){
 	if ($scope.title && $scope.title !=''){
-		$scope.posts.push({
+		posts.create({
 			title:$scope.title,
 			link:$scope.link,
-			'upvotes':0});
+			'upvotes':0
+		});
 
 		$scope.title='';
 		$scope.link='';

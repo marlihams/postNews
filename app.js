@@ -5,11 +5,13 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+require('./models/post.js');
+  require("./models/comments.js");
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var mongoose=require('mongoose');
-  require('./models/post.js');
+
   mongoose.connect("mongodb://localhost/postNews");
 var app = express();
 
